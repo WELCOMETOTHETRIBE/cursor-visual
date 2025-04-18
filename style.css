@@ -1,20 +1,17 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    overflow: hidden;
+    height: 100%;
+  }
 
-html, body {
-  height: 100%;
-  overflow: hidden;
-  background: #1a0033; /* Deep purple background */
-}
-
-#smokeCanvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  display: block;
-}
+  canvas#lightCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    pointer-events: none;
+    background: transparent;
+  }
+</style>
