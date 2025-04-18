@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SVG Lightning Effect</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: transparent;
+      overflow: hidden;
+    }
+
+    .lightning-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .bolt {
+      position: absolute;
+      width: 50px;
+      height: 150px;
+      animation: flash 2s infinite ease-in-out;
+      opacity: 0;
+    }
+
+    .bolt:nth-child(1) {
+      left: 20%;
+      top: 10%;
+      animation-delay: 0s;
+    }
+
+    .bolt:nth-child(2) {
+      left: 50%;
+      top: 25%;
+      animation-delay: 0.5s;
+    }
+
+    .bolt:nth-child(3) {
+      left: 75%;
+      top: 5%;
+      animation-delay: 1.2s;
+    }
+
+    @keyframes flash {
+      0%, 100% { opacity: 0; transform: scaleY(0.3); }
+      45% { opacity: 1; transform: scaleY(1); }
+      55% { opacity: 1; transform: scaleY(1); }
+      60%, 90% { opacity: 0; transform: scaleY(0.5); }
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      fill: #e0eaff;
+      filter: drop-shadow(0 0 8px #ffffff);
+    }
+  </style>
+</head>
+<body>
+  <div class="lightning-container">
+    <div class="bolt">
+      <svg viewBox="0 0 100 300" preserveAspectRatio="xMidYMid meet">
+        <polygon points="40,0 60,0 45,100 70,100 30,200 50,100 30,100" />
+      </svg>
+    </div>
+    <div class="bolt">
+      <svg viewBox="0 0 100 300" preserveAspectRatio="xMidYMid meet">
+        <polygon points="40,0 60,0 45,100 70,100 30,200 50,100 30,100" />
+      </svg>
+    </div>
+    <div class="bolt">
+      <svg viewBox="0 0 100 300" preserveAspectRatio="xMidYMid meet">
+        <polygon points="40,0 60,0 45,100 70,100 30,200 50,100 30,100" />
+      </svg>
+    </div>
+  </div>
+</body>
+</html>
