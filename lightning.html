@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lightning Test</title>
+  <title>Lightning Overlay</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
-      background: #06061a; /* TEMPORARY VISIBLE BACKGROUND */
       overflow: hidden;
+      background: transparent !important;
       height: 100%;
     }
 
@@ -20,22 +20,10 @@
       pointer-events: none;
       background: transparent !important;
     }
-
-    #debugMessage {
-      color: white;
-      text-align: center;
-      font-family: sans-serif;
-      font-size: 1rem;
-      padding-top: 2rem;
-    }
   </style>
 </head>
 <body>
   <canvas id="lightCanvas"></canvas>
-  <div id="debugMessage">
-    ⚡ Lightning Test Active ⚡<br>
-    If you see this text, the iframe is working.
-  </div>
   <script>
     (function() {
       const canvas = document.getElementById('lightCanvas');
