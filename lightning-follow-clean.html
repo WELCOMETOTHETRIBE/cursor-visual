@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cursor Lightning Clean</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    .click-catcher {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: auto;
+    }
+
+    #lightningContainer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .bolt {
+      fill: none;
+      stroke: #ffffff;
+      stroke-width: 2;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 8px white);
+      opacity: 0;
+      animation: flashOut 0.4s ease-out forwards;
+    }
+
+    .bolt.glow {
+      stroke: #a3c9ff;
+      stroke-width: 4;
+      filter: drop-shadow(0 0 18px #a3c9ff);
+    }
+
+    @keyframes flashOut {
+      0% { opacity: 1; }
+      50% { opacity: 1; transform: scale(1.05); }
+      100% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="click-catcher" id="followLayer"></div>
+  <svg id="lightningContainer"></svg>
+  <script>
+    const container = document.getElementById("lightningContainer");
+    const followLayer = document.getElementById("followLayer");
+    let lastTime = 0;
+
+    function drawBolt(x, y, height = 300) {
+      let d = `M ${x} ${y}`;
+      for (let i = 0; i < 10; i++) {
+        x += (Math.random() - 0.5) * 50;
+        y += height / 10;
+        d += ` L ${x} ${y}`;
+      }
+
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", d);
+      path.setAttribute("class", "bolt");
+
+      const glow = path.cloneNode();
+      glow.setAttribute("class", "bolt glow");
+
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("style", "position:absolute;width:100%;height:100%;top:0;left:0;pointer-events:none;");
+      svg.appendChild(glow);
+      svg.appendChild(path);
+      container.appendChild(svg);
+
+      setTimeout(() => svg.remove(), 600);
+    }
+
+    followLayer.addEventListener("pointermove", (e) => {
+      const now = Date.now();
+      if (now - lastTime > 120) {
+        drawBolt(e.clientX, e.clientY);
+        lastTime = now;
+      }
+    });
+  </script>
+</body>
+</html>
