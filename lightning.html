@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome Lightning Effect</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      overflow: hidden;
+      height: 100%;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      background: transparent;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="lightCanvas"></canvas>
+  <script>
+    (function() {
+      const canvas = document.getElementById('lightCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      let bolts = [];
+
+      function createLightning(x, y, intensity = 1) {
+        for (let i = 0; i < intensity; i++) {
+          bolts.push({
+            x,
+            y,
+            path: generateBoltPath(x, y),
+            life: 1.0
+          });
+        }
+      }
+
+      function generateBoltPath(x, y) {
+        const path = [];
+        let cx = x, cy = y;
+        for (let i = 0; i < 20; i++) {
+          cx += (Math.random() - 0.5) * 40;
+          cy += Math.random() * 40;
+          path.push({ x: cx, y: cy });
+        }
+        return path;
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        bolts.forEach((bolt, i) => {
+          ctx.beginPath();
+          ctx.moveTo(bolt.x, bolt.y);
+          bolt.path.forEach(p => ctx.lineTo(p.x, p.y));
+          const hue = 200 + Math.random() * 40;
+          ctx.strokeStyle = `hsla(${hue}, 100%, 85%, ${bolt.life * 0.6})`;
+          ctx.shadowColor = `hsla(${hue}, 100%, 75%, ${bolt.life * 0.4})`;
+          ctx.shadowBlur = 25;
+          ctx.lineWidth = 2 + Math.random() * 2;
+          ctx.stroke();
+          bolt.life *= 0.9;
+          if (bolt.life < 0.02) bolts.splice(i, 1);
+        });
+        requestAnimationFrame(draw);
+      }
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+
+      window.addEventListener('resize', resize);
+      window.addEventListener('click', e => createLightning(e.clientX, e.clientY, 3));
+      window.addEventListener('touchstart', e => {
+        if (e.touches[0]) {
+          createLightning(e.touches[0].clientX, e.touches[0].clientY, 3);
+        }
+      }, { passive: true });
+
+      draw();
+    })();
+  </script>
+</body>
+</html>
