@@ -17,7 +17,6 @@ let ripples = [];
 let lastX = mouse.x;
 let lastY = mouse.y;
 
-// Common pointer update function
 function updatePointer(x, y) {
   const dx = x - lastX;
   const dy = y - lastY;
@@ -29,12 +28,10 @@ function updatePointer(x, y) {
   lastX = x;
   lastY = y;
 
-  // Add ripple if moving enough
   if (mouse.speed > 8) {
     ripples.push({ x: mouse.x, y: mouse.y, radius: 0, alpha: 0.4 });
   }
 
-  // Trail
   trail.push({
     x: mouse.x,
     y: mouse.y,
@@ -45,12 +42,10 @@ function updatePointer(x, y) {
   if (trail.length > 100) trail.shift();
 }
 
-// Mouse move
 window.addEventListener("mousemove", (e) => {
   updatePointer(e.clientX, e.clientY);
 });
 
-// Touch move
 window.addEventListener("touchmove", (e) => {
   if (e.touches.length > 0) {
     const touch = e.touches[0];
@@ -58,23 +53,22 @@ window.addEventListener("touchmove", (e) => {
   }
 }, { passive: true });
 
-// Resize support
 window.addEventListener("resize", () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 });
 
 function draw() {
-  ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
+  ctx.fillStyle = "rgba(26, 0, 51, 0.15)"; // Semi-transparent deep purple
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // Light beam
   ctx.beginPath();
   ctx.moveTo(mouse.x, mouse.y);
   ctx.lineTo(mouse.x - mouse.vx * 6, mouse.y - mouse.vy * 6);
-  ctx.strokeStyle = "rgba(0,255,255,0.1)";
+  ctx.strokeStyle = "rgba(0, 204, 255, 0.2)"; // Electric blue
   ctx.lineWidth = 8;
-  ctx.shadowColor = "cyan";
+  ctx.shadowColor = "#00ccff";
   ctx.shadowBlur = 40;
   ctx.stroke();
 
@@ -83,8 +77,8 @@ function draw() {
     let p = trail[i];
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(0,255,255,${p.alpha})`;
-    ctx.shadowColor = "rgba(0,255,255,1)";
+    ctx.fillStyle = `rgba(255, 0, 204, ${p.alpha})`; // Vibrant magenta
+    ctx.shadowColor = "#ff00cc";
     ctx.shadowBlur = p.glow;
     ctx.fill();
 
@@ -98,9 +92,9 @@ function draw() {
     let r = ripples[i];
     ctx.beginPath();
     ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
-    ctx.strokeStyle = `rgba(0,255,255,${r.alpha})`;
+    ctx.strokeStyle = `rgba(0, 255, 255, ${r.alpha})`; // Bright cyan
     ctx.lineWidth = 1.5;
-    ctx.shadowColor = "cyan";
+    ctx.shadowColor = "#00ffff";
     ctx.shadowBlur = 10;
     ctx.stroke();
     r.radius += 2;
