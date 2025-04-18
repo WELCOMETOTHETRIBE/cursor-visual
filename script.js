@@ -17,23 +17,24 @@ let ripples = [];
 let lastX = mouse.x;
 let lastY = mouse.y;
 
-window.addEventListener("mousemove", (e) => {
-  const dx = e.clientX - lastX;
-  const dy = e.clientY - lastY;
+// Common pointer update function
+function updatePointer(x, y) {
+  const dx = x - lastX;
+  const dy = y - lastY;
   mouse.vx = dx;
   mouse.vy = dy;
   mouse.speed = Math.sqrt(dx * dx + dy * dy);
-  mouse.x = e.clientX;
-  mouse.y = e.clientY;
-  lastX = e.clientX;
-  lastY = e.clientY;
+  mouse.x = x;
+  mouse.y = y;
+  lastX = x;
+  lastY = y;
 
-  // Create a ripple only if the mouse moves significantly
+  // Add ripple if moving enough
   if (mouse.speed > 8) {
     ripples.push({ x: mouse.x, y: mouse.y, radius: 0, alpha: 0.4 });
   }
 
-  // Add a glowing trail
+  // Trail
   trail.push({
     x: mouse.x,
     y: mouse.y,
@@ -42,20 +43,32 @@ window.addEventListener("mousemove", (e) => {
     glow: 25 + mouse.speed * 2
   });
   if (trail.length > 100) trail.shift();
+}
+
+// Mouse move
+window.addEventListener("mousemove", (e) => {
+  updatePointer(e.clientX, e.clientY);
 });
 
-// Handle resize
+// Touch move
+window.addEventListener("touchmove", (e) => {
+  if (e.touches.length > 0) {
+    const touch = e.touches[0];
+    updatePointer(touch.clientX, touch.clientY);
+  }
+}, { passive: true });
+
+// Resize support
 window.addEventListener("resize", () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 });
 
 function draw() {
-  // Background fade for trailing effect
   ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // LIGHT BEAM trail (stretch beam)
+  // Light beam
   ctx.beginPath();
   ctx.moveTo(mouse.x, mouse.y);
   ctx.lineTo(mouse.x - mouse.vx * 6, mouse.y - mouse.vy * 6);
@@ -65,7 +78,7 @@ function draw() {
   ctx.shadowBlur = 40;
   ctx.stroke();
 
-  // Glowing trail particles
+  // Glowing trail
   for (let i = 0; i < trail.length; i++) {
     let p = trail[i];
     ctx.beginPath();
@@ -80,7 +93,7 @@ function draw() {
     p.glow *= 0.95;
   }
 
-  // Ripple pulses
+  // Ripples
   for (let i = 0; i < ripples.length; i++) {
     let r = ripples[i];
     ctx.beginPath();
@@ -94,7 +107,6 @@ function draw() {
     r.alpha *= 0.95;
   }
 
-  // Clear old ripples
   ripples = ripples.filter(r => r.alpha > 0.01);
 
   requestAnimationFrame(draw);
