@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ambient Lightning</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: transparent;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    #lightningContainer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    .bolt {
+      fill: none;
+      stroke: #ffffff;
+      stroke-width: 2;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 10px white);
+      opacity: 0;
+      animation: flashOut 0.6s ease-out forwards;
+    }
+
+    .bolt.glow {
+      stroke: #a3c9ff;
+      stroke-width: 4;
+      filter: drop-shadow(0 0 20px #a3c9ff);
+    }
+
+    .flash-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle, rgba(255,255,255,0.5) 0%, transparent 70%);
+      opacity: 0;
+      animation: flashScreen 0.4s ease-out forwards;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes flashOut {
+      0% { opacity: 1; transform: scale(1); }
+      20% { opacity: 1; transform: scale(1.1); }
+      50% { opacity: 0.7; transform: scale(0.95); }
+      100% { opacity: 0; transform: scale(1); }
+    }
+
+    @keyframes flashScreen {
+      0% { opacity: 0.4; }
+      50% { opacity: 0.2; }
+      100% { opacity: 0; }
+    }
+
+    .trail {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #a3c9ff;
+      border-radius: 50%;
+      opacity: 0.8;
+      animation: particleFade 0.6s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes particleFade {
+      0% { opacity: 0.8; transform: scale(1); }
+      100% { opacity: 0; transform: scale(2); }
+    }
+  </style>
+</head>
+<body>
+  <svg id="lightningContainer"></svg>
+  <script>
+    const container = document.getElementById("lightningContainer");
+
+    function generateBoltPath(x, y, height = 300) {
+      let d = `M ${x} ${y}`;
+      let segments = 12;
+      let segmentLength = height / segments;
+      for (let i = 0; i < segments; i++) {
+        x += (Math.random() - 0.5) * 60;
+        y += segmentLength;
+        d += ` L ${x} ${y}`;
+      }
+      return d;
+    }
+
+    function spawnTrail(x, y) {
+      const trail = document.createElement("div");
+      trail.className = "trail";
+      trail.style.left = `${x}px`;
+      trail.style.top = `${y}px`;
+      container.appendChild(trail);
+      setTimeout(() => trail.remove(), 600);
+    }
+
+    function flashScreen() {
+      const flash = document.createElement("div");
+      flash.className = "flash-overlay";
+      document.body.appendChild(flash);
+      setTimeout(() => flash.remove(), 400);
+    }
+
+    function spawnBolt(x, y, height = 300) {
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", generateBoltPath(x, y, height));
+      path.setAttribute("class", "bolt");
+
+      const glow = path.cloneNode();
+      glow.setAttribute("class", "bolt glow");
+
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("style", "position:absolute;width:100%;height:100%;top:0;left:0;pointer-events:none;");
+      svg.appendChild(glow);
+      svg.appendChild(path);
+      container.appendChild(svg);
+
+      for (let i = 0; i < 4; i++) {
+        const tx = x + (Math.random() - 0.5) * 60;
+        const ty = y + Math.random() * height;
+        spawnTrail(tx, ty);
+      }
+
+      flashScreen();
+      setTimeout(() => svg.remove(), 600);
+    }
+
+    function loopLightning() {
+      const x = Math.random() * window.innerWidth;
+      const y = 0;
+      spawnBolt(x, y);
+      setTimeout(loopLightning, 2000 + Math.random() * 2500);
+    }
+
+    loopLightning();
+  </script>
+</body>
+</html>
