@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tap Lightning</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: transparent;
+      height: 100%;
+    }
+
+    .lightning-svg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .bolt {
+      position: absolute;
+      width: 100px;
+      height: 300px;
+      fill: #e0eaff;
+      opacity: 0;
+      transition: opacity 0.1s;
+      filter: drop-shadow(0 0 8px white);
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .bolt.active {
+      opacity: 1;
+      animation: boltFlash 0.3s ease-out forwards;
+    }
+
+    @keyframes boltFlash {
+      0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="lightning-svg" id="lightningContainer">
+    <!-- Bolt will be inserted here -->
+  </div>
+
+  <script>
+    const lightningContainer = document.getElementById('lightningContainer');
+
+    function spawnBolt(x, y) {
+      const bolt = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      bolt.setAttribute("viewBox", "0 0 100 300");
+      bolt.setAttribute("class", "bolt active");
+      bolt.style.left = x + "px";
+      bolt.style.top = y + "px";
+
+      const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+      poly.setAttribute("points", "40,0 60,0 45,100 70,100 30,200 50,100 30,100");
+
+      bolt.appendChild(poly);
+      lightningContainer.appendChild(bolt);
+
+      setTimeout(() => {
+        bolt.remove();
+      }, 400);
+    }
+
+    document.addEventListener("click", (e) => {
+      spawnBolt(e.clientX, e.clientY);
+    });
+
+    document.addEventListener("touchstart", (e) => {
+      if (e.touches[0]) {
+        spawnBolt(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+  </script>
+</body>
+</html>
