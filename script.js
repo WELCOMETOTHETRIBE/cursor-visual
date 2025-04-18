@@ -4,59 +4,59 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let particles = [];
-let hue = 0;
+let bolts = [];
 
-function createParticle(x, y, force = false) {
-  const angle = Math.random() * Math.PI * 2;
-  const speed = Math.random() * 1.5;
-  const particle = {
-    x,
-    y,
-    alpha: 1,
-    size: Math.random() * 20 + 20,
-    vx: Math.cos(angle) * speed,
-    vy: Math.sin(angle) * speed,
-    hue: hue + Math.random() * 60,
-    angle: angle,
-    angularVelocity: (Math.random() - 0.5) * 0.2,
-    force
-  };
-  particles.push(particle);
+function createLightning(x, y, intensity = 1) {
+  for (let i = 0; i < intensity; i++) {
+    bolts.push({
+      x,
+      y,
+      path: generateBoltPath(x, y),
+      life: 1.0,
+      brightness: 1.0
+    });
+  }
+}
+
+function generateBoltPath(x, y) {
+  const path = [];
+  let currentX = x;
+  let currentY = y;
+
+  for (let i = 0; i < 20; i++) {
+    const dx = (Math.random() - 0.5) * 40;
+    const dy = Math.random() * 40;
+    currentX += dx;
+    currentY += dy;
+    path.push({ x: currentX, y: currentY });
+  }
+
+  return path;
 }
 
 function draw() {
-  ctx.fillStyle = 'rgba(26, 0, 51, 0.1)';
+  ctx.fillStyle = "rgba(10, 10, 30, 0.2)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  hue = (hue + 0.3) % 360;
+  bolts.forEach((bolt, i) => {
+    ctx.beginPath();
+    ctx.moveTo(bolt.x, bolt.y);
 
-  particles.forEach((p, i) => {
-    // Turbulent swirling movement
-    p.angle += p.angularVelocity;
-    const swirlStrength = 0.5;
-    p.vx += Math.cos(p.angle) * swirlStrength * 0.02;
-    p.vy += Math.sin(p.angle) * swirlStrength * 0.02;
+    bolt.path.forEach(p => {
+      ctx.lineTo(p.x, p.y);
+    });
 
-    p.x += p.vx;
-    p.y += p.vy;
-    p.alpha *= 0.97;
-    p.size *= 0.985;
+    const hue = 200 + Math.random() * 40;
+    ctx.strokeStyle = `hsla(${hue}, 100%, 85%, ${bolt.life})`;
+    ctx.shadowColor = `hsla(${hue}, 100%, 75%, ${bolt.life})`;
+    ctx.shadowBlur = 25;
+    ctx.lineWidth = 2 + Math.random() * 2;
+    ctx.stroke();
 
-    if (p.alpha <= 0.01 || p.size <= 1) {
-      particles.splice(i, 1);
-    } else {
-      // Gradient color blend
-      const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
-      gradient.addColorStop(0, `hsla(${p.hue}, 100%, 75%, ${p.alpha})`);
-      gradient.addColorStop(1, `hsla(${(p.hue + 60) % 360}, 100%, 60%, 0)`);
+    bolt.life *= 0.9;
 
-      ctx.beginPath();
-      ctx.fillStyle = gradient;
-      ctx.shadowColor = `hsla(${p.hue}, 100%, 75%, ${p.alpha})`;
-      ctx.shadowBlur = 25;
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fill();
+    if (bolt.life < 0.02) {
+      bolts.splice(i, 1);
     }
   });
 
@@ -64,30 +64,22 @@ function draw() {
 }
 
 canvas.addEventListener('mousemove', (e) => {
-  for (let i = 0; i < 3; i++) {
-    createParticle(e.clientX, e.clientY);
-  }
+  createLightning(e.clientX, e.clientY, 1);
 });
 
 canvas.addEventListener('touchmove', (e) => {
   e.preventDefault();
   const touch = e.touches[0];
-  for (let i = 0; i < 3; i++) {
-    createParticle(touch.clientX, touch.clientY);
-  }
+  createLightning(touch.clientX, touch.clientY, 1);
 }, { passive: false });
 
 canvas.addEventListener('click', (e) => {
-  for (let i = 0; i < 10; i++) {
-    createParticle(e.clientX, e.clientY, true);
-  }
+  createLightning(e.clientX, e.clientY, 3);
 });
 
 canvas.addEventListener('touchstart', (e) => {
   const touch = e.touches[0];
-  for (let i = 0; i < 10; i++) {
-    createParticle(touch.clientX, touch.clientY, true);
-  }
+  createLightning(touch.clientX, touch.clientY, 3);
 }, { passive: true });
 
 window.addEventListener('resize', () => {
