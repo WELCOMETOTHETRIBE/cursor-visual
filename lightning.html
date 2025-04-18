@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lightning Overlay</title>
+  <title>Lightning Test</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
+      background: #06061a; /* TEMPORARY VISIBLE BACKGROUND */
       overflow: hidden;
-      background: transparent !important;
       height: 100%;
     }
 
@@ -22,14 +22,19 @@
     }
 
     #debugMessage {
-      display: none; /* Hide text now that it's working */
+      color: white;
+      text-align: center;
+      font-family: sans-serif;
+      font-size: 1rem;
+      padding-top: 2rem;
     }
   </style>
 </head>
 <body>
   <canvas id="lightCanvas"></canvas>
   <div id="debugMessage">
-    You shouldn't see this. If you do, Taplink is misbehaving 😅
+    ⚡ Lightning Test Active ⚡<br>
+    If you see this text, the iframe is working.
   </div>
   <script>
     (function() {
