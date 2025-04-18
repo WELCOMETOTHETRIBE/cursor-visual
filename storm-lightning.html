@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Storm Lightning FX</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: transparent;
+      overflow: hidden;
+    }
+
+    #clouds {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(ellipse at top, rgba(0,0,0,0.4), transparent 70%),
+                  radial-gradient(ellipse at bottom, rgba(0,0,0,0.3), transparent 70%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    #lightningContainer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: auto;
+      z-index: 9999;
+    }
+
+    .bolt {
+      position: absolute;
+      fill: none;
+      stroke: #ffffff;
+      stroke-width: 2;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 6px white);
+      opacity: 0;
+      animation: flashOut 0.4s ease-out forwards;
+    }
+
+    .bolt.glow {
+      stroke: #a3c9ff;
+      stroke-width: 4;
+      filter: drop-shadow(0 0 12px #a3c9ff);
+    }
+
+    @keyframes flashOut {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.1); }
+      100% { opacity: 0; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div id="clouds"></div>
+  <svg id="lightningContainer"></svg>
+  <script>
+    const container = document.getElementById('lightningContainer');
+
+    function generateDramaticPath(x, y, height = 300) {
+      let d = `M ${x} ${y}`;
+      let segments = 12;
+      let segmentLength = height / segments;
+
+      for (let i = 0; i < segments; i++) {
+        x += (Math.random() - 0.5) * 40;
+        y += segmentLength;
+        d += ` L ${x} ${y}`;
+      }
+
+      return d;
+    }
+
+    function spawnBolt(x, y, height = 300) {
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", generateDramaticPath(x, y, height));
+      path.setAttribute("class", "bolt");
+
+      const glow = path.cloneNode();
+      glow.setAttribute("class", "bolt glow");
+
+      container.appendChild(glow);
+      container.appendChild(path);
+
+      setTimeout(() => {
+        glow.remove();
+        path.remove();
+      }, 500);
+    }
+
+    function randomStrike() {
+      const x = Math.random() * window.innerWidth;
+      spawnBolt(x, 0, 400);
+    }
+
+    setInterval(() => {
+      if (Math.random() < 0.4) randomStrike(); // Ambient lightning 40% chance
+    }, 3000);
+
+    document.addEventListener("click", (e) => {
+      spawnBolt(e.clientX, e.clientY);
+    });
+
+    document.addEventListener("touchstart", (e) => {
+      if (e.touches[0]) {
+        spawnBolt(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+  </script>
+</body>
+</html>
